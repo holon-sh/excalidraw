@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .paper { fill: #f2efe7; }
+    .orb-light { stop-color: #f3f1eb; }
+    .orb-mid { stop-color: #e4e2dc; }
+    .orb-edge { stop-color: #c9c8c0; }
+    @media (prefers-color-scheme: dark) {
+      .paper { fill: #191c18; }
+      .orb-light { stop-color: #393b37; }
+      .orb-mid { stop-color: #30332f; }
+      .orb-edge { stop-color: #262925; }
+    }
+  </style>
+  <defs>
+    <radialGradient id="orb" cx="28%" cy="23%" r="78%">
+      <stop class="orb-light" offset="0" />
+      <stop class="orb-mid" offset="57%" />
+      <stop class="orb-edge" offset="100%" />
+    </radialGradient>
+  </defs>
+  <rect class="paper" width="64" height="64" />
+  <circle cx="32" cy="32" r="21" fill="url(#orb)" />
+</svg>

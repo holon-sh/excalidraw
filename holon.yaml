@@ -1,0 +1,6 @@
+apps:
+  - name: excalidraw
+    path: .
+    mount: /
+    access:
+      server: {}

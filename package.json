@@ -1,0 +1,39 @@
+{
+  "name": "excalidraw",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.20"
+  },
+  "scripts": {
+    "prebuild": "holon types generate",
+    "build": "tsc --noEmit && vite build && vite build --mode mcp",
+    "serve": "node src/serve.ts",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "3.1.3",
+    "@modelcontextprotocol/ext-apps": "2.0.3",
+    "@modelcontextprotocol/server": "2.3.1",
+    "aws4fetch": "1.0.20",
+    "fractional-indexing": "3.2.0",
+    "holon-sh": "^0.0.1-dev.14",
+    "holon-ui": "^0.0.1-dev.8",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "@types/node": "26.6.4",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "holon-types": "0.0.1-dev.25",
+    "typescript": "7.0.2",
+    "vite": "8.3.3",
+    "vite-plugin-singlefile": "2.3.3"
+  },
+  "imports": {
+    "#holon-ui": "./generated/holon-ui/index.mjs",
+    "#holon-sh": "./generated/holon-sh/index.mjs"
+  }
+}

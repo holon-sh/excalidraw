@@ -1,0 +1,41 @@
+html,
+body,
+#board {
+  height: 100%;
+  margin: 0;
+}
+
+/* A host sizes an embedded view to its content, so the board needs a height of its own. */
+.mcp-app #board {
+  height: 560px;
+}
+
+/* At the right of Excalidraw's footer, beside its help button and clear of the buttons it centers. */
+.excalidraw .footer-center {
+  align-self: center;
+}
+
+.credit {
+  margin: 0 0 0 auto;
+  color: var(--color-muted-darker);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+#status {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  z-index: 10;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transform: translateX(-50%);
+  background: #1e1e1e;
+  color: #fff;
+  font: 14px system-ui, sans-serif;
+}
+
+#status:empty {
+  display: none;
+}

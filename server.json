@@ -1,0 +1,84 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.holon-sh/excalidraw",
+  "title": "Excalidraw · Holon",
+  "description": "A shared Excalidraw board that people and agents draw on together",
+  "version": "0.4.12",
+  "repository": {
+    "url": "https://github.com/holon-sh/excalidraw",
+    "source": "github"
+  },
+  "websiteUrl": "https://excalidraw.holonlabs.io",
+  "icons": [
+    {
+      "src": "https://excalidraw.holonlabs.io/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": [
+        "any"
+      ]
+    },
+    {
+      "src": "https://excalidraw.holonlabs.io/apple-touch-icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "180x180"
+      ]
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "sh.holon": {
+        "egress": [
+          {
+            "host": "{S3_HOST}",
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/holon-sh/excalidraw:0.4.12",
+      "transport": {
+        "type": "streamable-http",
+        "url": "http://localhost:3000/mcp"
+      },
+      "environmentVariables": [
+        {
+          "name": "S3_HOST",
+          "description": "Host of the S3-compatible API that keeps boards, such as <account id>.r2.cloudflarestorage.com. Without it, boards last as long as the server does."
+        },
+        {
+          "name": "S3_BUCKET",
+          "description": "Bucket that keeps boards.",
+          "default": "excalidraw-boards"
+        },
+        {
+          "name": "S3_REGION",
+          "description": "Region requests are signed for: auto for R2, the bucket's own for providers with regions.",
+          "default": "auto"
+        },
+        {
+          "name": "S3_ACCESS_KEY_ID",
+          "description": "Access key of a token that can read and write the bucket's objects.",
+          "isSecret": true
+        },
+        {
+          "name": "S3_SECRET_ACCESS_KEY",
+          "description": "Secret of that token.",
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://excalidraw.holonlabs.io/mcp/excalidraw"
+    }
+  ]
+}
