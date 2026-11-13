@@ -23,9 +23,6 @@ import "./styles.css";
 
 const lifetime = new AbortController();
 const status = document.querySelector<HTMLElement>("#status")!;
-// The build picks the surface. Inside an MCP Apps host the page calls its
-// server through the host. On its own it calls the endpoint, where a call can
-// stay open and stream.
 const app = await connect();
 // The board takes its embedded height before Excalidraw measures it, which a
 // page in a background tab may not do again before it fits the board.
@@ -374,9 +371,7 @@ if (app.view) {
     lifetime.abort();
     return {};
   };
-  // read_board is the one tool that opens the board. A host that does not say
-  // which tool it was delivers the result as it came.
-  app.opened?.then((opened) => {
+  app.opened.then((opened) => {
     ({ board, url: address } =
       opened.tool === "read_board"
         ? opened.output
