@@ -3,7 +3,7 @@
   "name": "io.github.holon-sh/excalidraw",
   "title": "Excalidraw · Holon",
   "description": "A shared Excalidraw board that people and agents draw on together",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "repository": {
     "url": "https://github.com/holon-sh/excalidraw",
     "source": "github"
@@ -42,7 +42,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/holon-sh/excalidraw:0.4.12",
+      "identifier": "ghcr.io/holon-sh/excalidraw:0.4.13",
       "transport": {
         "type": "streamable-http",
         "url": "http://localhost:3000/mcp"
