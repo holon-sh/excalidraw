@@ -17,23 +17,16 @@ import type {
 } from "@excalidraw/excalidraw/types";
 import { createElement, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { App, createApps, type Outputs } from "#holon-ui";
+import { connect, type Outputs } from "#holon-ui";
 import type { Change } from "../src/tools.ts";
 import "./styles.css";
 
 const lifetime = new AbortController();
 const status = document.querySelector<HTMLElement>("#status")!;
-// Inside an MCP Apps host the page calls its server through the host. On its
-// own it calls the endpoint, where a call can stay open and stream.
-const view =
-  import.meta.env.MODE === "mcp" ? new App({ name: "excalidraw", version: "0.1.0" }) : undefined;
+const app = await connect();
 // The board takes its embedded height before Excalidraw measures it, which a
 // page in a background tab may not do again before it fits the board.
-if (view) document.documentElement.classList.add("mcp-app");
-const direct = createApps({
-  excalidraw: { endpoint: `${location.origin}/mcp/excalidraw` },
-}).excalidraw;
-const server = view ?? direct;
+if (app.view) document.documentElement.classList.add("mcp-app");
 
 /** Names this page to the server and to the other pages. */
 const client = crypto.randomUUID().slice(0, 8);
@@ -73,9 +66,9 @@ const link = (url: string, text: string) =>
       target: "_blank",
       rel: "noopener",
       onClick: (event) => {
-        if (!view?.getHostCapabilities()?.openLinks) return;
+        if (!app.view?.getHostCapabilities()?.openLinks) return;
         event.preventDefault();
-        view.openLink({ url }).catch(console.warn);
+        app.view.openLink({ url }).catch(console.warn);
       },
     },
     text,
@@ -223,10 +216,10 @@ function images() {
       continue;
     }
     const moved = file
-      ? server.tools
+      ? app.tools
           .put_image({ board, id, dataURL: file.dataURL }, { signal: lifetime.signal })
           .then(() => true)
-      : server.tools.get_image({ board, id }, { signal: lifetime.signal }).then(({ dataURL }) => {
+      : app.tools.get_image({ board, id }, { signal: lifetime.signal }).then(({ dataURL }) => {
           if (!dataURL) return false;
           const mimeType = dataURL.slice("data:".length, dataURL.indexOf(";"));
           excalidraw.addFiles([{ id, dataURL, mimeType, created: Date.now() } as BinaryFileData]);
@@ -344,7 +337,7 @@ function send() {
   for (const { id, version } of elements) known.set(id, version);
   told = JSON.stringify(mine);
   sending = true;
-  server.tools
+  app.tools
     .sync(
       { board, client, elements, presence: mine, ...(poll && { since }) },
       { signal: lifetime.signal },
@@ -373,30 +366,18 @@ function send() {
     );
 }
 
-/**
- * Subscribes to the board's changes, and reads the board as it stands: now,
- * and whenever the server says it skipped some.
- */
-function follow() {
-  direct.ext.events
-    .subscribe("board.changed", { board, client }, { signal: lifetime.signal, onGap: read })
-    .then(async (changes) => {
-      read();
-      for await (const { data } of changes) apply(data);
-    })
-    .catch((error) => retry(error, follow));
-}
-
-if (view) {
-  view.ontoolresult = ({ structuredContent }) => {
-    ({ board, url: address } = structuredContent as Outputs["excalidraw"]["read_board"]);
-    read();
-  };
-  view.onteardown = async () => {
+if (app.view) {
+  app.view.onteardown = async () => {
     lifetime.abort();
     return {};
   };
-  await view.connect();
+  app.opened.then((opened) => {
+    ({ board, url: address } =
+      opened.tool === "read_board"
+        ? opened.output
+        : (opened.output as { structuredContent: Outputs["excalidraw"]["read_board"] }).structuredContent);
+    read();
+  }, console.warn);
   // A host relays tool calls and nothing else, so the embedded board asks instead of subscribing.
   const poll = setInterval(read, 1000);
   lifetime.signal.addEventListener("abort", () => clearInterval(poll));
@@ -406,5 +387,19 @@ if (view) {
   url.searchParams.set("board", board);
   history.replaceState(null, "", url);
   address = url.href;
+  const { events } = app.ext;
+  /**
+   * Subscribes to the board's changes, and reads the board as it stands: now,
+   * and whenever the server says it skipped some.
+   */
+  const follow = () => {
+    events
+      .subscribe("board.changed", { board, client }, { signal: lifetime.signal, onGap: read })
+      .then(async (changes) => {
+        read();
+        for await (const { data } of changes) apply(data);
+      })
+      .catch((error) => retry(error, follow));
+  };
   follow();
 }
