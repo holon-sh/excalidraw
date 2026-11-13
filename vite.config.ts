@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vite";
+import { defaultClientConditions, defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import manifest from "./package.json" with { type: "json" };
 
@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
   // The site's icons and link previews; an embedded view needs none of them.
   publicDir: mode === "mcp" ? false : "public",
   plugins: mode === "mcp" ? [viteSingleFile()] : [],
+  resolve: { conditions: mode === "mcp" ? ["mcp-app", ...defaultClientConditions] : undefined },
   build: {
     outDir: mode === "mcp" ? "../dist/mcp" : "../dist/web",
     emptyOutDir: true,
