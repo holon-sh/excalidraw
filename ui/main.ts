@@ -387,19 +387,8 @@ if (app.view) {
   url.searchParams.set("board", board);
   history.replaceState(null, "", url);
   address = url.href;
-  const { events } = app.ext;
-  /**
-   * Subscribes to the board's changes, and reads the board as it stands: now,
-   * and whenever the server says it skipped some.
-   */
-  const follow = () => {
-    events
-      .subscribe("board.changed", { board, client }, { signal: lifetime.signal, onGap: read })
-      .then(async (changes) => {
-        read();
-        for await (const { data } of changes) apply(data);
-      })
-      .catch((error) => retry(error, follow));
-  };
-  follow();
+  // Hears the board's changes, and reads the board as it stands: now, and whenever the server skipped some.
+  const changes = await app.ext.events.subscribe("board.changed", { board, client }, { onGap: read });
+  read();
+  for await (const { data } of changes) apply(data);
 }
