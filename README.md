@@ -18,5 +18,5 @@ npm run serve
 The page is at `http://127.0.0.1:3000/` and the MCP endpoint at `http://127.0.0.1:3000/mcp/excalidraw`. Or run the image:
 
 ```sh
-docker run -p 3000:3000 ghcr.io/holon-sh/excalidraw
+docker run -p 3000:3000 holonlabs/excalidraw
 ```
