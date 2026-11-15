@@ -23,7 +23,7 @@ async function start(t: TestContext, env: Record<string, string> = {}) {
     stdio: ["ignore", "pipe", "inherit"],
   });
   t.after(() => server.kill());
-  const [, origin] = (await once(server.stdout, "data")).toString().match(/Board at (\S+)\//)!;
+  const [, origin] = (await once(server.stdout, "data")).toString().match(/Serving (\S+)\//)!;
   const endpoint = `${origin}/mcp/excalidraw`;
   const board = createApps({ name: "page", version: "1.0.0" }, { excalidraw: null }, { excalidraw: { endpoint } }).excalidraw!;
   t.after(() => board.close());

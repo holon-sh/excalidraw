@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-/** The board's view, which an MCP Apps host shows when an agent reads a board. */
-export const viewUri = "ui://board/view.html";
 /** Hides a tool that only the board's page calls from agents. */
 const page = { ui: { visibility: ["app"] } };
 
@@ -130,7 +128,6 @@ export const tools = {
     inputSchema: z.strictObject({ board: board.optional() }),
     outputSchema: z.object({ board, url: z.string(), shapes: z.array(seen) }),
     annotations: { readOnlyHint: true },
-    _meta: { ui: { resourceUri: viewUri } },
   },
   draw: {
     description:
