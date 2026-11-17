@@ -1,4 +1,4 @@
-// holon-generated-apps-v1 app=excalidraw-typed-chat.5pY7zn
+// holon-generated-apps-v1 app=excalidraw
 import type { ToolClient, EndpointBinding, CreateOptions } from "holon-ui/runtime";
 export { ToolCallError } from "holon-ui/runtime";
 export type ExcalidrawChatOutputBoardUrlId = { "boardUrl": string; "id": string; };

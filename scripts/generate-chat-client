@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+chat=$(cd "${1:?Usage: scripts/generate-chat-client EXCALIDRAW_CHAT_CHECKOUT}" && pwd)
+cd "$(dirname "$0")/.."
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT
+mkdir -p "$scratch/excalidraw"
+printf '%s\n' '{"type":"module","dependencies":{"holon-ui":"0.0.1-dev.19"}}' > "$scratch/excalidraw/package.json"
+holon types generate "$scratch/excalidraw" -s "excalidraw-chat=$chat"
+cp "$scratch/excalidraw"/generated/holon-ui/index.* ui/chat-sdk/
