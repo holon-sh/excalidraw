@@ -18,7 +18,7 @@ const shape = z.strictObject({
       "Names the shape. The id of a shape on the board changes that shape, keeping the fields you leave out.",
     ),
   type: z
-    .enum(["rectangle", "ellipse", "diamond", "text", "arrow", "frame"])
+    .enum(["rectangle", "ellipse", "diamond", "text", "frame"])
     .optional()
     .describe("Required for a new shape."),
   x: z
@@ -51,6 +51,15 @@ const shape = z.strictObject({
     .describe("The id of the frame the shape sits in. An empty string takes it out."),
   from: z.string().optional().describe("The id of the shape an arrow leaves."),
   to: z.string().optional().describe("The id of the shape an arrow points at."),
+});
+
+const arrowGeometry = z.number().optional().describe("Ignored for arrows. The board derives it from the connected shapes.");
+const arrow = shape.extend({
+  type: z.literal("arrow"),
+  x: arrowGeometry,
+  y: arrowGeometry,
+  width: arrowGeometry,
+  height: arrowGeometry,
 });
 
 const seen = z.object({
@@ -121,34 +130,37 @@ export type Element = z.infer<typeof element>;
 export type Cursor = z.infer<typeof cursor>;
 export type Change = z.infer<typeof changed.payloadSchema>;
 
+const readBoard = "Read a shared Excalidraw board. Returns its shapes and the URL where anyone can watch and edit it live.";
+const drawShapes = "Draw or update boxes, text, arrows and frames. Connect shapes by their ids using an arrow's from and to fields. The board calculates arrow geometry. Give new shapes ids to connect them or put them in a frame in the same call. Omit x and y to let the board place new shapes below what is already there. Boxes size to fit their text and frames wrap their contents.";
+const eraseShapes = "Erase shapes from a board by id. An arrow attached to an erased shape stays, so erase it too if it should go. The shapes in an erased frame stay.";
+
 export const tools = {
   read_board: {
-    description:
-      "Read a shared Excalidraw board and open it. Returns its shapes and the URL where anyone can watch and edit it live. Leave out board to start a new one.",
-    inputSchema: z.strictObject({ board: board.optional() }),
+    description: readBoard,
+    inputSchema: z.strictObject({
+      board: board.optional().describe("The board's id, as in its URL. Omit to start a new board."),
+    }).describe(readBoard),
     outputSchema: z.object({ board, url: z.string(), shapes: z.array(seen) }),
     annotations: { readOnlyHint: true },
   },
   draw: {
-    description:
-      "Draw on a board: boxes (rectangle, ellipse, diamond), text, arrows between two shapes, and frames that hold shapes under a name. Everyone with the board open sees it at once. Give shapes your own short ids to join them with arrows and put them in frames in the same call. Leave out x and y, and the board lays new shapes out along their arrows, below what is already there. A box sizes itself to its text unless you give a width and height, and a frame wraps the shapes in it.",
+    description: drawShapes,
     inputSchema: z.strictObject({
       board,
-      shapes: z.array(shape).min(1).max(500),
+      shapes: z.array(z.union([shape, arrow])).min(1).max(500),
       direction: z
         .enum(["right", "down"])
         .optional()
         .describe("Which way arrows run between the shapes the board places: right unless given."),
-    }),
+    }).describe(drawShapes),
     outputSchema: z.object({
       ids: z.array(z.string()).describe("Each shape's id, in the order given."),
     }),
     annotations: { destructiveHint: false },
   },
   erase: {
-    description:
-      "Erase shapes from a board by id. An arrow attached to an erased shape stays, so erase it too if it should go. The shapes in an erased frame stay.",
-    inputSchema: z.strictObject({ board, ids: z.array(z.string()).min(1).max(500) }),
+    description: eraseShapes,
+    inputSchema: z.strictObject({ board, ids: z.array(z.string()).min(1).max(500) }).describe(eraseShapes),
     outputSchema: z.object({
       ids: z.array(z.string()).describe("The ids that were on the board and are now erased."),
     }),

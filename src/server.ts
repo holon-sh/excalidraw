@@ -65,7 +65,7 @@ export function createServer() {
   const server = new McpServer({ name, title, description, version, websiteUrl, icons });
   events.serve(server);
   page.serve(server);
-  server.registerTool("read_board", { ...tools.read_board, _meta: page.meta }, async ({ board = randomUUID().slice(0, 8) }, ctx) => {
+  server.registerTool("read_board", { ...tools.read_board, _meta: page.meta }, async ({ board = randomUUID() }, ctx) => {
     // The page is mounted at the app's root.
     const { origin } = getContext(ctx.http);
     return result({ board, url: `${origin}/?board=${board}`, shapes: describe(await boards.elements(board)) });
