@@ -8,6 +8,15 @@ The page and agents share one MCP server. The page edits with the same `tools/ca
 
 ![A browser page, an agent in Claude Code and the board inside a Claude chat all call the same MCP endpoint](.github/surfaces.svg)
 
+## Board chat
+
+On the Holon demo, a board link opens the shared conversation in a floating
+panel. Guests can read it. Sign in to post or mention `@agent`, and choose
+**Show on board** to focus the shapes the agent edited.
+
+The browser connects to the separate Chat MCP app on the same installation.
+Chat and Agent MCP own the transcript and Claude turns respectively.
+
 ## Self-host
 
 ```sh

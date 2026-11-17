@@ -19,6 +19,7 @@ import { createElement, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { connect, type Outputs } from "#holon-ui";
 import type { Change } from "../src/tools.ts";
+import { mountBoardChat } from "./board-chat.ts";
 import "./styles.css";
 
 const lifetime = new AbortController();
@@ -32,6 +33,7 @@ if (app.view) document.documentElement.classList.add("mcp-app");
 const client = crypto.randomUUID().slice(0, 8);
 const name = `Guest ${Math.floor(100 + Math.random() * 900)}`;
 let board: string;
+let toggleChat: (() => void) | undefined;
 /** The board's page, which anyone with the link can open and draw on. */
 let address: string | undefined;
 /** Names the server's memory, which starts empty when the server restarts. */
@@ -163,7 +165,16 @@ await new Promise<void>((loaded) => {
           pointer = { x, y };
           send();
         },
-        renderTopRightUI: () => createElement(LiveCollaborationTrigger, { isCollaborating: true, onSelect: share }),
+        renderTopRightUI: () => createElement(
+          "div",
+          { style: { display: "flex", gap: 8 } },
+          !app.view && createElement("button", {
+            className: "board-chat-toggle", type: "button", "aria-controls": "board-chat",
+            "aria-expanded": new URL(location.href).searchParams.has("board"),
+            onClick: () => toggleChat?.(),
+          }, "Chat"),
+          createElement(LiveCollaborationTrigger, { isCollaborating: true, onSelect: share }),
+        ),
       },
       createElement(Menu),
       createElement(
@@ -383,10 +394,15 @@ if (app.view) {
   lifetime.signal.addEventListener("abort", () => clearInterval(poll));
 } else {
   const url = new URL(location.href);
-  board = url.searchParams.get("board") ?? crypto.randomUUID().slice(0, 8);
+  const linked = url.searchParams.get("board");
+  board = linked ?? crypto.randomUUID();
   url.searchParams.set("board", board);
   history.replaceState(null, "", url);
   address = url.href;
+  toggleChat = mountBoardChat(board, linked !== null, (ids) => {
+    const selected = excalidraw.getSceneElements().filter(({ id }) => ids.includes(id));
+    if (selected.length) excalidraw.scrollToContent(selected, { fitToContent: true, animate: true });
+  });
   // Hears the board's changes, and reads the board as it stands: now, and whenever the server skipped some.
   const changes = await app.ext.events.subscribe("board.changed", { board, client }, { onGap: read });
   read();
