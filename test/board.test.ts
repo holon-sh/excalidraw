@@ -123,7 +123,7 @@ test("draw makes labelled boxes, text and the arrows between them, moves and era
   await call("draw", {
     board: "b",
     shapes: [
-      { id: "link", type: "arrow", from: "api", to: "db", text: "SQL" },
+      { id: "link", type: "arrow", from: "api", to: "db", text: "SQL", width: -10, height: 0 },
       { id: "api", type: "rectangle", x: 0, y: 0, text: "API" },
       { id: "db", type: "ellipse", x: 400, y: 0, width: 120, height: 60, text: "DB", stroke: "dashed" },
       { id: "title", type: "text", x: 0, y: -100, text: "Hi", fontSize: 40 },
