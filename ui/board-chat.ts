@@ -13,6 +13,7 @@ function select<T extends HTMLElement>(root: HTMLElement, query: string, type: {
 function signIn(board: string) {
   const next = new URL(location.pathname, location.origin);
   next.searchParams.set("board", board);
+  next.searchParams.set("chat", "open");
   const login = new URL("/.well-known/holon/login", location.origin);
   login.searchParams.set("resource", new URL("/mcp/excalidraw", location.origin).href);
   login.searchParams.set("returnTo", next.pathname + next.search);

@@ -170,7 +170,7 @@ await new Promise<void>((loaded) => {
           { style: { display: "flex", gap: 8 } },
           !app.view && createElement("button", {
             className: "board-chat-toggle", type: "button", "aria-controls": "board-chat",
-            "aria-expanded": new URL(location.href).searchParams.has("board"),
+            "aria-expanded": false,
             onClick: () => toggleChat?.(),
           }, "Chat"),
           createElement(LiveCollaborationTrigger, { isCollaborating: true, onSelect: share }),
@@ -394,12 +394,13 @@ if (app.view) {
   lifetime.signal.addEventListener("abort", () => clearInterval(poll));
 } else {
   const url = new URL(location.href);
-  const linked = url.searchParams.get("board");
-  board = linked ?? crypto.randomUUID();
+  const reopenChat = url.searchParams.get("chat") === "open";
+  board = url.searchParams.get("board") ?? crypto.randomUUID();
   url.searchParams.set("board", board);
+  url.searchParams.delete("chat");
   history.replaceState(null, "", url);
   address = url.href;
-  toggleChat = mountBoardChat(board, linked !== null, (ids) => {
+  toggleChat = mountBoardChat(board, reopenChat, (ids) => {
     const selected = excalidraw.getSceneElements().filter(({ id }) => ids.includes(id));
     if (selected.length) excalidraw.scrollToContent(selected, { fitToContent: true, animate: true });
   });
