@@ -17,8 +17,8 @@
     "@modelcontextprotocol/server": "2.3.1",
     "aws4fetch": "1.0.20",
     "fractional-indexing": "3.2.0",
-    "holon-sh": "^0.0.1-dev.32",
-    "holon-ui": "^0.0.1-dev.24",
+    "holon-sh": "^0.0.1-dev.37",
+    "holon-ui": "^0.0.1-dev.25",
     "zod": "4.6.5"
   },
   "devDependencies": {
